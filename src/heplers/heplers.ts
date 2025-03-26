@@ -1,7 +1,18 @@
-export const debounce = (fn: (...args: unknown[]) => void, delay: number) => {
-  let timeout: NodeJS.Timeout;
-  return function (...args: unknown[]) {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => fn(...args), delay);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function debounce<T extends (...args: any[]) => any>(
+  fn: T,
+  delay: number
+): (...args: Parameters<T>) => void {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+
+  return function (...args: Parameters<T>) {
+    if (timeout !== null) {
+      clearTimeout(timeout);
+    }
+
+    timeout = setTimeout(() => {
+      fn(...args);
+      timeout = null;
+    }, delay);
   };
-};
+}
